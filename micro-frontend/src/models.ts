@@ -21,3 +21,11 @@ export interface Channel{
     name: string;
     join: {parent: string};
 }
+
+export interface Message {
+    id: string;
+    content: string;
+    user_id: string;
+    join: { parent: string };
+    created_at: string;
+}

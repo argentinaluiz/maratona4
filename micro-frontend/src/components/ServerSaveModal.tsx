@@ -1,13 +1,12 @@
 // @flow
 import * as React from "react";
 import * as yup from "../util/yup";
-import { Modal, Button } from "react-bootstrap";
+import { Modal } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers";
-import { useAxios } from "../hooks/useAxios";
 import { useSnackbar } from "notistack";
 import { Server } from "../models";
-import { http } from "../util/http";
+import { authHttp } from "../util/http";
 export interface ServerModalProps {
   show: boolean;
   onClose: (serverCreated?: Server) => void;
@@ -39,7 +38,7 @@ export const ServerSaveModal: React.FC<ServerModalProps> = (props) => {
     formData.append("name", data.name);
     formData.append("logo", data.logo[0]);
     try {
-      const { data: server } = await http.post("/servers", formData);
+      const { data: server } = await authHttp.post("/servers", formData);
 
       enqueueSnackbar("Grupo cadastrado!");
       handleClose(server);

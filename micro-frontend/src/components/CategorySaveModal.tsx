@@ -4,11 +4,10 @@ import * as yup from "../util/yup";
 import { Modal } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers";
-import { useAxios } from "../hooks/useAxios";
 import { useSnackbar } from "notistack";
 import { Category } from "../models";
 import { useParams } from "react-router-dom";
-import { http } from "../util/http";
+import { authHttp } from "../util/http";
 export interface CategoryModalProps {
   show: boolean;
   onClose: (categoryCreated?: Category) => void;
@@ -17,9 +16,8 @@ const validationSchema = yup.object().shape({
   name: yup.string().label("Nome").required(),
 });
 export const CategorySaveModal: React.FC<CategoryModalProps> = (props) => {
-  const {serverId} = useParams();  
+  const { serverId } = useParams();
   const { show: showProp, onClose } = props;
-  //const axios = useAxios();
   const { enqueueSnackbar } = useSnackbar();
   const [show, setShow] = React.useState(showProp);
 
@@ -38,8 +36,10 @@ export const CategorySaveModal: React.FC<CategoryModalProps> = (props) => {
 
   const onSubmit = async (data: any) => {
     try {
-      const { data: category } = await http.post(`/servers/${serverId}/categories`, data);
-
+      const { data: category } = await authHttp.post(
+        `/servers/${serverId}/categories`,
+        data
+      );
       enqueueSnackbar("Categoria cadastrada!");
       handleClose(category);
     } catch (e) {

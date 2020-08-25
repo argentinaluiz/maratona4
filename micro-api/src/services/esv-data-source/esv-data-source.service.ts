@@ -65,23 +65,6 @@ export class EsvDataSourceService extends juggler.DataSource {
             Channel: 'Message'
           }
         },
-        // "category": {
-        //     "type": "nested",
-        //     "properties": {
-        //         "id": {"type": "keyword"},
-        //         "name": {"type": "text"},
-        //         "slug": {"type": "keyword"},
-        //     }
-        // },
-        // "payment_methods": {
-        //     "type": "nested",
-        //     "properties": {
-        //         "payment_method_id": {"type": "keyword"},
-        //         "installments": {"type": "integer"},
-        //         "max_installments_discount": {"type": "integer"},
-        //         "discount_percentage": {"type": "integer"}
-        //     }
-        // }
       },
     };
   }

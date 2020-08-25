@@ -4,10 +4,9 @@ import * as yup from "../util/yup";
 import { Modal } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers";
-import { useAxios } from "../hooks/useAxios";
 import { useSnackbar } from "notistack";
 import { Channel } from "../models";
-import { http } from "../util/http";
+import { authHttp } from "../util/http";
 export interface ChannelModalProps {
   show: boolean;
   categoryId: string;
@@ -18,7 +17,6 @@ const validationSchema = yup.object().shape({
 });
 export const ChannelSaveModal: React.FC<ChannelModalProps> = (props) => {
   const { show: showProp, onClose, categoryId } = props;
-  //const axios = useAxios();
   const { enqueueSnackbar } = useSnackbar();
   const [show, setShow] = React.useState(showProp);
 
@@ -37,7 +35,7 @@ export const ChannelSaveModal: React.FC<ChannelModalProps> = (props) => {
 
   const onSubmit = async (data: any) => {
     try {
-      const { data: channel } = await http.post(
+      const { data: channel } = await authHttp.post(
         `/categories/${categoryId}/channels`,
         data
       );

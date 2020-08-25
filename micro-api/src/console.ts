@@ -1,5 +1,4 @@
 import { BootstrapConsole } from 'nestjs-console';
-import {AppModule} from "./app.module";
 import { CommandsModule } from './commands/commands.module';
 
 const bootstrap = new BootstrapConsole({

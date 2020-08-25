@@ -1,7 +1,7 @@
 import React from "react";
 import "./scss/main.scss";
 import { KeycloakProvider } from "@react-keycloak/web";
-import { AppRouter } from "./router/AppRouter";
+import { AppRouter } from "./components/router/AppRouter";
 import { keycloak, keycloakProviderInitConfig } from "./util/auth";
 import { SnackbarProvider } from "notistack";
 import { UserProvider } from "./components/user/UserProvider";

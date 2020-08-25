@@ -1,12 +1,5 @@
 import { AnyAction } from "redux";
-
-export interface Message {
-  id: string;
-  content: string;
-  user_id: string;
-  join: { parent: string };
-  created_at: string;
-}
+import { Message } from "../../models";
 
 export interface Channel {
   id: string;

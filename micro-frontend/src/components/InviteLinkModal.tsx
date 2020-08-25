@@ -1,7 +1,6 @@
 // @flow
 import * as React from "react";
 import { Modal } from "react-bootstrap";
-import { useAxios } from "../hooks/useAxios";
 import { useSnackbar } from "notistack";
 export interface InviteServerProps {
   show: boolean;
@@ -11,7 +10,6 @@ export interface InviteServerProps {
 
 export const InviteLinkModal: React.FC<InviteServerProps> = (props) => {
   const { show: showProp, onClose, serverId } = props;
-  //const axios = useAxios();
   const { enqueueSnackbar } = useSnackbar();
   const [show, setShow] = React.useState(showProp);
   const inputRef = React.useRef() as React.MutableRefObject<any>;

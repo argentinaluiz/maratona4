@@ -9,10 +9,10 @@ export class UserFixtureService {
   constructor(private keyCloakUserService: KeycloakUserService) {}
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  async create(data) {
-      if(!existsSync(join(MEDIA_DIR, 'users'))){
-        mkdirSync(join(MEDIA_DIR, 'users'));
-      }
+  async create(data: any) {
+    if (!existsSync(join(MEDIA_DIR, 'users'))) {
+      mkdirSync(join(MEDIA_DIR, 'users'));
+    }
     copyFileSync(
       join(`${process.cwd()}`, 'media-fake', data.photo_file),
       join(User.PHOTO_PATH, data.photo_file),
@@ -21,10 +21,10 @@ export class UserFixtureService {
     return this.keyCloakUserService.create(data);
   }
 
-  async deleteIfExists(email: string):Promise<void>{
-      const user = await this.keyCloakUserService.findOne({ username: email });
-      if(user){
-          await this.keyCloakUserService.delete(user.id)
-      }
+  async deleteIfExists(email: string): Promise<void> {
+    const user = await this.keyCloakUserService.findOne({ username: email });
+    if (user) {
+      await this.keyCloakUserService.delete(user.id);
+    }
   }
 }

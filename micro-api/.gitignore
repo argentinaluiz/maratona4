@@ -39,3 +39,4 @@ lerna-debug.log*
 .history
 .idea
 media/
+.docker/redisdata

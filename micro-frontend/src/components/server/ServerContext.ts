@@ -3,21 +3,24 @@ import { Server } from "../../models";
 
 interface ServerContextProps {
   serverSelected: {
-    serverSelected: Server | null;
-    setServerSelected: Dispatch<SetStateAction<Server | null>>;
+    data: Server | null;
+    update: Dispatch<SetStateAction<Server | null>>;
   };
   servers: {
-    servers: Server[];
-    setServers: Dispatch<SetStateAction<Server[]>>;
+    data: Server[];
+    update: Dispatch<SetStateAction<Server[]>>;
   };
 }
 
 const ServerContext = createContext<ServerContextProps>({
   serverSelected: {
-    serverSelected: {} as any,
-    setServerSelected: (server) => {},
+    data: {} as any,
+    update: (server) => {},
   },
-  servers: { servers: [], setServers: (servers) => {} },
+  servers: {
+    data: [],
+    update: (servers) => {},
+  },
 });
 
 export default ServerContext;

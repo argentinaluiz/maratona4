@@ -18,16 +18,16 @@ import { imageValidator } from 'src/validators';
 import { diskStorage } from 'multer';
 import { hashFilename } from 'src/file';
 import { KeycloakUserService } from 'src/services/keycloak-user/keycloak-user.service';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiTags('user')
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller('users')
 export class UserController {
   constructor(
     private userRepo: UserRepository,
-    private keyCloakUserService: KeycloakUserService
-  ) {
-    
-  }
+    private keyCloakUserService: KeycloakUserService,
+  ) {}
 
   @Public()
   @UseInterceptors(
@@ -48,9 +48,13 @@ export class UserController {
     if (!photo) {
       throw new UnprocessableEntityException('Missing photo file');
     }
-    return this.keyCloakUserService.create({...body, photo_file: photo.filename});
+    return this.keyCloakUserService.create({
+      ...body,
+      photo_file: photo.filename,
+    });
   }
 
+  @ApiBearerAuth()
   @Get('me')
   me(@Req() req: { user: any }): Promise<User> {
     return this.userRepo.findOne({

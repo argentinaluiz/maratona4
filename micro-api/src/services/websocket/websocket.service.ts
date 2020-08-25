@@ -22,7 +22,7 @@ interface RedisSet {
   (key: string, value: string): Promise<string>;
 }
 
-@WebSocketGateway(0, {namespace: "channels"})
+@WebSocketGateway(0, { namespace: 'channels' })
 export class WebsocketService implements OnGatewayConnection {
   @WebSocketServer()
   server;
@@ -33,77 +33,103 @@ export class WebsocketService implements OnGatewayConnection {
     private messageRepo: MessageRepository,
   ) {}
 
-  async handleConnection(client: Socket, ...args: any[]) {
-     console.log(client.handshake.query);
+  async handleConnection(client: Socket, ...args: any[]): Promise<void> {
     try {
-      const result = await this.keycloakService.connect.grantManager.validateAccessToken(
-        client.handshake.query.token,
-      );
-      console.log(result);
-      if (!(typeof result === 'string')) {
-        throw new UnauthorizedException();
-      }
-      const user: {
-        sub: string;
-      } = await this.keycloakService.connect.grantManager.userInfo(
-        client.handshake.query.token,
-      );
+      const token = client.handshake.query.token;
+      await this.authenticate(token);
+      const userId = await this.getUserId(token);
       const { redisSet } = WebsocketService.redisClient(client);
-      await redisSet(client.id, user.sub);
+      await redisSet(client.id, userId);
     } catch (e) {
       client.disconnect(true);
       throw e;
     }
   }
 
+  private async authenticate(token) {
+    const sameToken = await this.keycloakService.connect.grantManager.validateAccessToken(
+      token,
+    );
+    if (!(typeof sameToken === 'string')) {
+      throw new UnauthorizedException();
+    }
+  }
+
+  private async getUserId(token) {
+    const user: {
+      sub: string;
+    } = await this.keycloakService.connect.grantManager.userInfo(token);
+    return user.sub;
+  }
+
   @SubscribeMessage('join')
   async onJoin(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { channel_id: string, server_id: string },
+    @MessageBody() data: { server_id: string },
   ): Promise<void> {
-    const { channel_id, server_id } = data;
-    //const server = await this.getServer(channel_id);
-    //client.join(server.id);
-    client.join(server_id);
-    const { redisSet } = WebsocketService.redisClient(client);
-    //await redisSet(client.id, JSON.stringify({ channel_id }));
-    // const messages = await this.messageRepo.find({
-    //   where: {
-    //     //@ts-ignore
-    //     has_parent: {
-    //       parent_type: 'Channel',
-    //       query: {
-    //         match: {
-    //           id: channel_id,
-    //         },
-    //       },
-    //     },
-    //   },
-    //  // order: ['created_at ASC'],
-    // });
-    // client.emit('get-messages', messages);
+    const { server_id } = data;
+    const { redisGet } = WebsocketService.redisClient(client);
+    const userId = await redisGet(client.id);
+    const server = await this.serverRepo.findOne({
+      where: {
+        id: server_id,
+        //@ts-ignore
+        members_id: userId,
+      },
+    });
 
+    if (!server) {
+      const error = new Error('Not authorized');
+      error.name = 'NotAuthorized';
+      client.error(error);
+      throw error;
+    }
+
+    client.join(server_id);
     console.log('join', client.id);
   }
 
   @SubscribeMessage('send-message')
   async sendMessage(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { content: string, channel_id: string},
+    @MessageBody() data: { content: string; channel_id: string },
   ): Promise<void> {
     const { channel_id, content } = data;
-    //const server = await this.getServer(channel_id);
-    //client.join(server.id);
-    const { redisSet, redisGet } = WebsocketService.redisClient(client);
+    const { redisGet } = WebsocketService.redisClient(client);
     const userId = await redisGet(client.id);
-    const message = await this.messageRepo.create({
-        content,
-        user_id: userId,
-        join: {name: "Message", parent: channel_id}
+    const server = await this.serverRepo.findOne({
+      where: {
+        //@ts-ignore
+        has_child: {
+          type: 'Category',
+          query: {
+            has_child: {
+              type: 'Channel',
+              query: {
+                match: {
+                  id: channel_id,
+                },
+              },
+            },
+          },
+        },
+        //@ts-ignore
+        members_id: userId,
+      },
     });
-    client.emit('new-message', {message});
-    const server = await this.getServer(channel_id);
-    client.broadcast.to(server.id)
+    if (!server) {
+      const error = new Error('Not authorized');
+      error.name = 'NotAuthorized';
+      client.error(error);
+      throw error;
+    }
+    const message = await this.messageRepo.create({
+      content,
+      user_id: userId,
+      join: { name: 'Message', parent: channel_id },
+    });
+    client.emit('new-message', { message });
+    client.broadcast.to(server.id).emit('new-message', { message });
     console.log('message sent');
   }
 
@@ -115,26 +141,5 @@ export class WebsocketService implements OnGatewayConnection {
     const redisSet: RedisSet = promisify(redisClient.set).bind(redisClient);
 
     return { redisGet, redisSet };
-  }
-
-  private async getServer(channelId: string) {
-    return this.serverRepo.findOne({
-      where: {
-        //@ts-ignore
-        has_child: {
-          type: 'Category',
-          query: {
-            has_child: {
-              type: 'Channel',
-              query: {
-                match: {
-                  id: channelId,
-                },
-              },
-            },
-          },
-        },
-      },
-    });
   }
 }

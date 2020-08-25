@@ -16,6 +16,4 @@ export interface AddWebSocketAction extends AnyAction {
   };
 }
 
-export type Actions =
-  | InitWebsocketAction
-  | AddWebSocketAction;
+export type Actions = InitWebsocketAction | AddWebSocketAction;

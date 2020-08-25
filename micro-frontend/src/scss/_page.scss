@@ -15,15 +15,15 @@
   height: 100vh; //view height
 
   @include respond-to($_768) {
-    grid-template-columns: 71px 130px auto 130px;
+    grid-template-columns: 71px 130px auto 70px;
   }
 
   @include respond-to($_992) {
-    grid-template-columns: 71px 150px auto 130px;
+    grid-template-columns: 71px 150px auto 70px;
   }
 
   @include respond-to($_1200) {
-    grid-template-columns: 71px 240px auto 390px;
+    grid-template-columns: 71px 240px auto 350px;
   }
 
   .bar-list-group {
@@ -68,7 +68,7 @@
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-
+      cursor: pointer;
       width: 30px;
       height: 30px;
       margin-bottom: 15px;
@@ -588,7 +588,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-
+            cursor: pointer;  
             &::after {
               display: none;
             }

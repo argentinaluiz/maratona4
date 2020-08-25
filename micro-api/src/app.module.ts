@@ -20,19 +20,20 @@ import { ChannelRepository } from './repositories/channel/channel.repository';
 import { WebsocketService } from './services/websocket/websocket.service';
 import { MessageRepository } from './repositories/message/message.repository';
 import { MessageController } from './controllers/message/message.controller';
+import { MEDIA_DIR } from './file';
+import { MemberController } from './controllers/member/member.controller';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
     CommandsModule,
     MulterModule.register({
-      dest: './media',
+      dest: MEDIA_DIR,
     }),
     KeycloakModule.registerAsync({
       useFactory: () => {
         const keycloakConfig = JSON.parse(process.env.KEYCLOAK_JSON);
         return {
-      
           baseUrl: keycloakConfig['auth-server-url'],
           realmName: keycloakConfig['realm'],
           clientId: keycloakConfig['resource'],
@@ -48,6 +49,7 @@ import { MessageController } from './controllers/message/message.controller';
     UserController,
     ChannelController,
     MessageController,
+    MemberController,
   ],
   providers: [
     AppService,
@@ -57,8 +59,8 @@ import { MessageController } from './controllers/message/message.controller';
     UserRepository,
     ExistsValidator,
     {
-      provide: APP_GUARD, 
-      useClass: AuthGuard
+      provide: APP_GUARD,
+      useClass: AuthGuard,
     },
     KeycloakUserService,
     ChannelRepository,

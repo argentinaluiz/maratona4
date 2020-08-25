@@ -8,7 +8,6 @@ import { Types, Creators } from "./index";
 
 function ioConnect(token: string) {
   return new Promise((resolve) => {
-    //@ts-ignore
     const socket = io(`${process.env.REACT_APP_BACKEND_URL}/channels`, { query: { token } });
     socket.on("connect", () => {
       resolve(socket);

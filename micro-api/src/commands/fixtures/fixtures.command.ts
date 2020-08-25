@@ -8,6 +8,7 @@ import { DefaultCrudRepository } from '@loopback/repository';
 import chalk from 'chalk';
 import { exec } from 'child_process';
 import { MEDIA_DIR } from 'src/file';
+
 @Console()
 export class FixturesCommand {
   constructor(
@@ -20,25 +21,42 @@ export class FixturesCommand {
     description: 'Seed data in database',
   })
   async command(): Promise<void> {
-    await this.deleteAllDocuments();
-    exec(`rm -rf ${MEDIA_DIR}/*`);
+    await this.preCommand();
     for (const fixture of fixtures) {
       if ('model' in fixture) {
-        const repository = this.getRepository(
-            //@ts-ignore
-          fixture.model,
-        ) as DefaultCrudRepository<any, any>;
         //@ts-ignore
-        await repository.create(fixture.fields);
+        await this.processRepository(fixture.model, fixture.fields);
       } else {
-        // @ts-ignore
         const [serviceClass, method] = fixture.fixture.split('@');
-        const service = this.getService(serviceClass);
-        await service[method](fixture.fields);
+        this.processService(serviceClass, method, fixture.fields);
       }
     }
 
     console.log(chalk.green('Documents generated'));
+  }
+
+  async preCommand(): Promise<void> {
+    await this.deleteAllDocuments();
+    exec(`rm -rf ${MEDIA_DIR}/*`);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  async processRepository(model: string, data: any): Promise<void> {
+    const repository = this.getRepository(model) as DefaultCrudRepository<
+      any,
+      any
+    >;
+    await repository.create(data);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  async processService(
+    serviceClass: string,
+    method: string,
+    data: any,
+  ): Promise<void> {
+    const service = this.getService(serviceClass);
+    await service[method](data);
   }
 
   async deleteAllDocuments(): Promise<void> {
@@ -54,8 +72,8 @@ export class FixturesCommand {
     });
   }
 
-  getRepository<T>(name: string): T {
-    return this.moduleRef.get(`${name}Repository`);
+  getRepository(name: string): DefaultCrudRepository<any, any> {
+    return this.getService(`${name}Repository`) as any;
   }
 
   getService<T>(name: string): T {

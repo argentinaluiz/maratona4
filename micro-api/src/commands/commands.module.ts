@@ -11,30 +11,29 @@ import { KeycloakUserService } from 'src/services/keycloak-user/keycloak-user.se
 import { ServerFixtureService } from './fixtures/server-fixture/server-fixture.service';
 
 @Module({
-    imports: [
-        ConfigModule.forRoot(),
-        ConsoleModule,
-        KeycloakModule.registerAsync({
-            useFactory: () => {
-              const keycloakConfig = JSON.parse(process.env.KEYCLOAK_JSON);
-              return {
-            
-                baseUrl: keycloakConfig['auth-server-url'],
-                realmName: keycloakConfig['realm'],
-                clientId: keycloakConfig['resource'],
-                clientSecret: keycloakConfig['credentials']['secret'],
-              };
-            },
-          }),
-    ],
-    providers: [
-        EsvDataSourceService,
-        ServerRepository,
-        UserRepository,
-        FixturesCommand,
-        UserFixtureService,
-        KeycloakUserService,
-        ServerFixtureService,
-    ]
+  imports: [
+    ConfigModule.forRoot(),
+    ConsoleModule,
+    KeycloakModule.registerAsync({
+      useFactory: () => {
+        const keycloakConfig = JSON.parse(process.env.KEYCLOAK_JSON);
+        return {
+          baseUrl: keycloakConfig['auth-server-url'],
+          realmName: keycloakConfig['realm'],
+          clientId: keycloakConfig['resource'],
+          clientSecret: keycloakConfig['credentials']['secret'],
+        };
+      },
+    }),
+  ],
+  providers: [
+    EsvDataSourceService,
+    ServerRepository,
+    UserRepository,
+    FixturesCommand,
+    UserFixtureService,
+    KeycloakUserService,
+    ServerFixtureService,
+  ],
 })
 export class CommandsModule {}

@@ -12,7 +12,6 @@ export class ExistsValidator implements ValidatorConstraintInterface {
     ) {}
 
     async validate(id: string, validationArguments: ValidationArguments): Promise<boolean> {
-        console.log(id, validationArguments)
         if(!id){
             return false;
         }

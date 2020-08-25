@@ -14,8 +14,11 @@ services:
       - DB_PORT=3306
       - DB_USER=root
       - DB_PASSWORD=root
+      - REGISTER_URL=http://host.docker.internal:3001/register
     ports:
       - 8080:8080
+    volumes: 
+      - ./themes/slack:/opt/jboss/keycloak/themes/slack
 
   db:
     build: ./.docker/mysql

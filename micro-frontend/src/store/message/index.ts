@@ -70,7 +70,6 @@ function addMessage(
   state = INITIAL_STATE,
   action: Typings.AddMessageAction
 ): Typings.MessageState {
-    console.log(action.payload)
   const channelId = action.payload.message.join.parent;
   const indexChannel = findIndexChannel(state.channels, channelId);
   if (indexChannel === -1) {
@@ -92,13 +91,15 @@ function addMessages(
     state = INITIAL_STATE,
     action: Typings.AddMessagesAction
   ): Typings.MessageState {
-      console.log(action.payload)
     const channelId = action.payload.messages[0].join.parent;
     const indexChannel = findIndexChannel(state.channels, channelId);
     if (indexChannel === -1) {
       return state;
     }
     const channel = state.channels[indexChannel];
+    if(channel.messages.length){
+        return state;
+    }
     channel.messages = [...channel.messages, ...action.payload.messages];
     return {
       ...state,

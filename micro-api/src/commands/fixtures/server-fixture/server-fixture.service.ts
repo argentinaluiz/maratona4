@@ -13,6 +13,7 @@ export class ServerFixtureService {
     private userRepo: UserRepository,
   ) {}
 
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   async create(data: { name: string; logo_file: string; user: string }) {
     if (!existsSync(join(MEDIA_DIR, 'servers'))) {
       mkdirSync(join(MEDIA_DIR, 'servers'));

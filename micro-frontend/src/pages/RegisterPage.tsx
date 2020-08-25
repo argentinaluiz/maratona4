@@ -4,7 +4,6 @@ import * as yup from "../util/yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers";
 import { Link, useHistory } from "react-router-dom";
-import { useAxios } from "../hooks/useAxios";
 import { useSnackbar } from "notistack";
 import { http } from "../util/http";
 
@@ -15,7 +14,6 @@ const validationSchema = yup.object().shape({
 });
 
 export const RegisterPage: React.FC = () => {
-  //const axios = useAxios();
   const history = useHistory();
   const { enqueueSnackbar } = useSnackbar();
   const { register, handleSubmit, errors } = useForm({
@@ -53,7 +51,7 @@ export const RegisterPage: React.FC = () => {
           </div>
           <div className="form-group">
             <input
-              className={"form-control" + (errors.photo ? " is-invalid" : "")}
+              className={"form-control"}
               type="file"
               name="photo"
               placeholder="Foto de perfil"
